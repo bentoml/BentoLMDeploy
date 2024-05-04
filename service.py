@@ -24,7 +24,7 @@ BENTO_MODEL_TAG = MODEL_ID.lower().replace("/", "--")
 
 
 @bentoml.service(
-    name="lmdeploy-llama3-8b-insruct-service",
+    name="bentolmdeploy-llama3-8b-insruct-service",
     traffic={
         "timeout": 300,
     },
