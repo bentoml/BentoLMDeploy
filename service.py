@@ -44,7 +44,7 @@ class LMDeploy:
         engine_config = TurbomindEngineConfig(
             model_name=MODEL_ID,
             model_format="hf",
-            cache_max_entry_count=0.9,
+            cache_max_entry_count=0.95,
         )
         self.engine = AsyncEngine(
             self.bento_model_ref.path, backend_config=engine_config
