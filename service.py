@@ -24,7 +24,7 @@ BENTO_MODEL_TAG = MODEL_ID.lower().replace("/", "--")
 
 
 @bentoml.service(
-    name="bentolmdeploy-llama3-8b-insruct-service",
+    name="bentolmdeploy-llama3-8b-insruct-service-benchmark",
     traffic={
         "timeout": 300,
     },
@@ -44,7 +44,7 @@ class LMDeploy:
         engine_config = TurbomindEngineConfig(
             model_name=MODEL_ID,
             model_format="hf",
-            cache_max_entry_count=0.9,
+            cache_max_entry_count=0.95,
         )
         self.engine = AsyncEngine(
             self.bento_model_ref.path, backend_config=engine_config
@@ -62,6 +62,7 @@ class LMDeploy:
     @bentoml.api
     async def generate(
         self,
+        ctx: bentoml.Context,
         prompt: str = "Explain superconductors in plain English",
         system_prompt: Optional[str] = SYSTEM_PROMPT,
         max_tokens: Annotated[int, Ge(128), Le(MAX_TOKENS)] = MAX_TOKENS,
@@ -77,10 +78,13 @@ class LMDeploy:
             system_prompt = SYSTEM_PROMPT
         prompt = PROMPT_TEMPLATE.format(user_prompt=prompt, system_prompt=system_prompt)
 
-        session_id = uuid.uuid1().int >> 64
+        session_id = abs(uuid.uuid4().int >> 96)
         stream = self.engine.generate(
             prompt, session_id=session_id, gen_config=gen_config
         )
 
         async for request_output in stream:
+            if await ctx.request.is_disconnected():
+                await self.engine.stop_session(session_id)
+                return
             yield request_output.response
