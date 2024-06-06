@@ -83,9 +83,10 @@ import bentoml
 with bentoml.SyncHTTPClient("http://localhost:3000") as client:
     response_generator = client.generate(
         prompt="Explain superconductors like I'm five years old",
+        max_tokens=1024
     )
     for response in response_generator:
-        print(response)
+        print(response, end='')
 ```
 
 </details>
