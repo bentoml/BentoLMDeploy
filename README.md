@@ -2,28 +2,31 @@
     <h1 align="center">Self-host LLMs with LMDeploy and BentoML</h1>
 </div>
 
-This is a BentoML example project, showing you how to serve and deploy open-source Large Language Models using [LMDeploy](https://github.com/InternLM/lmdeploy), a toolkit for compressing, deploying, and serving LLM.
+This is a BentoML example project, showing you how to serve and deploy open-source Large Language Models (LLMs) using [LMDeploy](https://github.com/InternLM/lmdeploy), a toolkit for compressing, deploying, and serving LLMs.
 
-See [here](https://github.com/bentoml/BentoML?tab=readme-ov-file#%EF%B8%8F-what-you-can-build-with-bentoml) for a full list of BentoML example projects.
+See [here](https://github.com/bentoml/BentoML/tree/main/examples) for a full list of BentoML example projects.
 
 💡 This example is served as a basis for advanced code customization, such as custom model, inference logic or LMDeploy options. For simple LLM hosting with OpenAI compatible endpoint without writing any code, see [OpenLLM](https://github.com/bentoml/OpenLLM).
-
 
 ## Prerequisites
 
 - You have installed Python 3.8+ and `pip`. See the [Python downloads page](https://www.python.org/downloads/) to learn more.
 - You have a basic understanding of key concepts in BentoML, such as Services. We recommend you read [Quickstart](https://docs.bentoml.com/en/1.2/get-started/quickstart.html) first.
 - If you want to test the Service locally, you need a Nvidia GPU with at least 20G VRAM.
+- This example uses Llama 3 8B Instruct. Make sure you have [gained access to the model](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct).
 - (Optional) We recommend you create a virtual environment for dependency isolation for this project. See the [Conda documentation](https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html) or the [Python documentation](https://docs.python.org/3/library/venv.html) for details.
 
 ## Install dependencies
 
 ```bash
 git clone https://github.com/bentoml/BentoLMDeploy.git
+cd BentoLMDeploy
 pip install -r requirements.txt
 ```
 
 ## Download the model
+
+Run the script to download Llama 3.
 
 ```bash
 python import_model.py
@@ -63,7 +66,8 @@ curl -X 'POST' \
   -H 'accept: text/event-stream' \
   -H 'Content-Type: application/json' \
   -d '{
-  "prompt": "Explain superconductors like I'\''m five years old",
+  "prompt": "Explain superconductors in plain English",
+  "max_tokens": 1024
 }'
 ```
 
@@ -86,7 +90,6 @@ with bentoml.SyncHTTPClient("http://localhost:3000") as client:
 
 </details>
 
-
 ## Deploy to BentoCloud
 
 After the Service is ready, you can deploy the application to BentoCloud for better management and scalability. [Sign up](https://www.bentoml.com/) if you haven't got a BentoCloud account.
@@ -100,21 +103,3 @@ bentoml deploy .
 Once the application is up and running on BentoCloud, you can access it via the exposed URL.
 
 **Note**: For custom deployment in your own infrastructure, use [BentoML to generate an OCI-compliant image](https://docs.bentoml.com/en/latest/guides/containerization.html).
-
-
-## Different LLM Models
-
-Besides the mistral-7b-instruct model, we have examples for other models in subdirectories of this repository. Below is a list of these models and links to the example subdirectories.
-
-- [Llama-2-7b-chat-hf](llama2-7b-chat/)
-- [Llama-3-8b-instruct](llama3-8b-instruct/)
-- [Mistral-7B-Instruct-v0.2](mistral-7b-instruct/)
-- [Mixtral-8x7B-Instruct-v0.1 with gptq quantization](mistral-7b-instruct/)
-- [Outlines integration](outlines-integration/)
-- [SOLAR-10.7B-v1.0](solar-10.7b-instruct/)
-
-
-## LLM tools integration examples
-
-- Every model directory contains codes to add OpenAI compatible endpoints to the BentoML service.
-- [outlines-integration/](outlines-integration/) contains the code to integrate with [outlines](https://github.com/outlines-dev/outlines) for structured generation.
