@@ -66,7 +66,7 @@ curl -X 'POST' \
   -H 'accept: text/event-stream' \
   -H 'Content-Type: application/json' \
   -d '{
-  "prompt": "Explain superconductors in plain English",
+  "prompt": "Explain superconductors like I'\''m five years old",
   "max_tokens": 1024
 }'
 ```
