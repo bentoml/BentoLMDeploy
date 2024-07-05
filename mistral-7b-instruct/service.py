@@ -72,5 +72,6 @@ class LMDeploy:
         async for request_output in stream:
             if await ctx.request.is_disconnected():
                 await self.engine.stop_session(session_id)
+                await self.engine.end_session(session_id)
                 return
             yield request_output.response
