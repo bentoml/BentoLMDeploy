@@ -12,24 +12,16 @@ See [here](https://github.com/bentoml/BentoML/tree/main/examples) for a full lis
 
 - You have installed Python 3.8+ and `pip`. See the [Python downloads page](https://www.python.org/downloads/) to learn more.
 - You have a basic understanding of key concepts in BentoML, such as Services. We recommend you read [Quickstart](https://docs.bentoml.com/en/1.2/get-started/quickstart.html) first.
-- If you want to test the Service locally, you need a Nvidia GPU with at least 20G VRAM.
-- This example uses Llama 3 8B Instruct. Make sure you have [gained access to the model](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct).
+- If you want to test the Service locally, you need a Nvidia GPU with at least 24G VRAM.
+- This example uses Mistral 7B Instruct. Make sure you have [gained access to the model](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2).
 - (Optional) We recommend you create a virtual environment for dependency isolation for this project. See the [Conda documentation](https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html) or the [Python documentation](https://docs.python.org/3/library/venv.html) for details.
 
 ## Install dependencies
 
 ```bash
 git clone https://github.com/bentoml/BentoLMDeploy.git
-cd BentoLMDeploy/llama3-8b-instruct
+cd BentoLMDeploy/mistral-7b-instruct
 pip install -r requirements.txt
-```
-
-## Download the model
-
-Run the script to download Llama 3.
-
-```bash
-python import_model.py
 ```
 
 ## Run the BentoML Service
@@ -39,17 +31,14 @@ We have defined a BentoML Service in `service.py`. Run `bentoml serve` in you
 ```bash
 $ bentoml serve .
 
-2024-05-04T17:24:01+0800 [INFO] [cli] Starting production HTTP BentoServer from "service:LMDeploy" listening on http://localhost:3000 (Press CTRL+C to quit)
-2024-05-04 17:24:03,239 - lmdeploy - INFO - input backend=turbomind, backend_config=TurbomindEngineConfig(model_name='meta-llama/Meta-Llama-3-8B-Instruct', model_format='hf', tp=1, session_len=None, max_batch_size=128, cach
-e_max_entry_count=0.9, cache_block_seq_len=64, quant_policy=0, rope_scaling_factor=0.0, use_logn_attn=False, download_dir=None, revision=None, max_prefill_token_num=8192, num_tokens_per_iter=0, max_prefill_iters=1)
-2024-05-04 17:24:03,240 - lmdeploy - INFO - input chat_template_config=None
-2024-05-04 17:24:03,339 - lmdeploy - INFO - updated chat_template_onfig=ChatTemplateConfig(model_name='llama3', system=None, meta_instruction=None, eosys=None, user=None, eoh=None, assistant=None, eoa=None, separator=None,
-capability=None, stop_words=None)
-2024-05-04 17:24:03,359 - lmdeploy - WARNING - model_source: hf_model
-2024-05-04 17:24:03,359 - lmdeploy - WARNING - model_name is deprecated in TurbomindEngineConfig and has no effect
-Special tokens have been added in the vocabulary, make sure the associated word embeddings are fine-tuned or trained.
-Special tokens have been added in the vocabulary, make sure the associated word embeddings are fine-tuned or trained.
-2024-05-04 17:24:03,727 - lmdeploy - WARNING - model_config:
+2024-07-05T23:57:36+0800 [INFO] [cli] Starting production HTTP BentoServer from "service:LMDeploy" listening on http://localhost:3000 (Press CTRL+C to quit)                                     
+2024-07-05 23:57:38,582 - lmdeploy - INFO - input backend=turbomind, backend_config=TurbomindEngineConfig(model_name='mistralai/Mistral-7B-Instruct-v0.2', model_format='hf', tp=1, session_len=N
+one, max_batch_size=128, cache_max_entry_count=0.95, cache_block_seq_len=64, enable_prefix_caching=False, quant_policy=0, rope_scaling_factor=0.0, use_logn_attn=False, download_dir=None, revisi
+on=None, max_prefill_token_num=8192, num_tokens_per_iter=0, max_prefill_iters=1)                                                                                                                 
+2024-07-05 23:57:38,582 - lmdeploy - INFO - input chat_template_config=None                                                                                                                      
+2024-07-05 23:57:38,616 - lmdeploy - INFO - updated chat_template_onfig=ChatTemplateConfig(model_name='mistral', system=None, meta_instruction=None, eosys=None, user=None, eoh=None, assistant=N
+one, eoa=None, separator=None, capability=None, stop_words=None)                                                                                                                                 
+2024-07-05 23:57:38,652 - lmdeploy - INFO - model_source: hf_model
 
 ...
 ```
