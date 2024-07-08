@@ -39,7 +39,8 @@ class LMDeploy:
 
     def __init__(self) -> None:
         from transformers import AutoTokenizer
-        from lmdeploy.archs import AsyncEngine, TurbomindEngineConfig
+        from lmdeploy.serve.async_engine import AsyncEngine
+        from lmdeploy.messages import TurbomindEngineConfig
 
         engine_config = TurbomindEngineConfig(
             model_name=MODEL_ID,
@@ -86,5 +87,6 @@ class LMDeploy:
         async for request_output in stream:
             if await ctx.request.is_disconnected():
                 await self.engine.stop_session(session_id)
+                await self.engine.end_session(session_id)
                 return
             yield request_output.response
