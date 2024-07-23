@@ -33,7 +33,7 @@ BENTO_MODEL_TAG = MODEL_ID.lower().replace("/", "--")
     },
     resources={
         "gpu": 1,
-        "gpu_type": "nvidia-l4",
+        "gpu_type": "nvidia-a100-80g",
     },
 )
 class LMDeploy:
