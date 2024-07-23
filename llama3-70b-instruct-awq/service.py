@@ -27,7 +27,7 @@ BENTO_MODEL_TAG = MODEL_ID.lower().replace("/", "--")
 
 @bentoml.mount_asgi_app(openai_api_app, path="/v1")
 @bentoml.service(
-    name="bentolmdeploy-llama3-70-instruct-awq-service",
+    name="bentolmdeploy-llama3-70b-instruct-awq-service",
     traffic={
         "timeout": 300,
     },
