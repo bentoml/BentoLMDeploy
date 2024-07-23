@@ -5,6 +5,8 @@ import bentoml
 from annotated_types import Ge, Le
 from typing_extensions import Annotated
 
+from openai_endpoints import openai_api_app
+
 
 MAX_TOKENS = 1024
 SYSTEM_PROMPT = """You are a helpful, respectful and honest assistant. Always answer as helpfully as possible, while being safe. Your answers should not include any harmful, unethical, racist, sexist, toxic, dangerous, or illegal content. Please ensure that your responses are socially unbiased and positive in nature.
@@ -23,8 +25,9 @@ MODEL_ID = "casperhansen/llama-3-70b-instruct-awq"
 BENTO_MODEL_TAG = MODEL_ID.lower().replace("/", "--")
 
 
+@bentoml.mount_asgi_app(openai_api_app, path="/v1")
 @bentoml.service(
-    name="bentolmdeploy-llama3-70-insruct-awq-service",
+    name="bentolmdeploy-llama3-70-instruct-awq-service",
     traffic={
         "timeout": 300,
     },
@@ -45,12 +48,15 @@ class LMDeploy:
         engine_config = TurbomindEngineConfig(
             model_name=MODEL_ID,
             model_format="awq",
-            cache_max_entry_count=0.95,
+            cache_max_entry_count=0.9,
             enable_prefix_caching=True,
         )
         self.engine = AsyncEngine(
             self.bento_model_ref.path, backend_config=engine_config
         )
+
+        import lmdeploy.serve.openai.api_server as lmdeploy_api_sever
+        lmdeploy_api_sever.VariableInterface.async_engine = self.engine
 
         tokenizer = AutoTokenizer.from_pretrained(self.bento_model_ref.path)
         self.stop_tokens = [
