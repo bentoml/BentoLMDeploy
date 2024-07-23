@@ -1,2 +1,3 @@
+autoawq==0.2.5
 bentoml>=1.3.0
-lmdeploy==0.4.2
+lmdeploy==0.5.1
