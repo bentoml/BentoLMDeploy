@@ -8,6 +8,7 @@ from typing_extensions import Annotated
 from openai_endpoints import openai_api_app
 
 
+MAX_SESSION_LEN = 2048
 MAX_TOKENS = 1024
 SYSTEM_PROMPT = """You are a helpful, respectful and honest assistant. Always answer as helpfully as possible, while being safe. Your answers should not include any harmful, unethical, racist, sexist, toxic, dangerous, or illegal content. Please ensure that your responses are socially unbiased and positive in nature.
 
@@ -47,6 +48,7 @@ class LMDeploy:
             model_format="hf",
             cache_max_entry_count=0.9,
             enable_prefix_caching=True,
+            session_len=MAX_SESSION_LEN,
         )
         self.engine = AsyncEngine(
             MODEL_ID, backend_config=engine_config
