@@ -2,10 +2,11 @@ import uuid
 from typing import AsyncGenerator, Optional
 
 import bentoml
+import fastapi
 from annotated_types import Ge, Le
 from typing_extensions import Annotated
 
-from openai_endpoints import openai_api_app
+openai_api_app = fastapi.FastAPI()
 
 
 MAX_SESSION_LEN = 2048
@@ -14,20 +15,13 @@ SYSTEM_PROMPT = """You are a helpful, respectful and honest assistant. Always an
 
 If a question does not make any sense, or is not factually coherent, explain why instead of answering something not correct. If you don't know the answer to a question, please don't share false information."""
 
-PROMPT_TEMPLATE = """<|begin_of_text|><|start_header_id|>system<|end_header_id|>
-
-{system_prompt}<|eot_id|><|start_header_id|>user<|end_header_id|>
-
-{user_prompt}<|eot_id|><|start_header_id|>assistant<|end_header_id|>
-
-"""
-
 MODEL_ID = "meta-llama/Meta-Llama-3.1-8B-Instruct"
 
 
-@bentoml.mount_asgi_app(openai_api_app, path="/v1")
+@bentoml.asgi_app(openai_api_app, path="/v1")
 @bentoml.service(
-    name="bentolmdeploy-llama3-8b-insruct-service-benchmark",
+    name="bentolmdeploy-llama3.1-8b-insruct-service",
+    image=bentoml.images.PythonImage(python_version="3.11").requirements_file("requirements.txt"),
     traffic={
         "timeout": 300,
     },
@@ -37,9 +31,11 @@ MODEL_ID = "meta-llama/Meta-Llama-3.1-8B-Instruct"
     },
 )
 class LMDeploy:
+    hf_model = bentoml.models.HuggingFaceModel(MODEL_ID)
 
     def __init__(self) -> None:
         from transformers import AutoTokenizer
+        from lmdeploy import ChatTemplateConfig
         from lmdeploy.serve.async_engine import AsyncEngine
         from lmdeploy.messages import TurbomindEngineConfig
 
@@ -51,19 +47,36 @@ class LMDeploy:
             session_len=MAX_SESSION_LEN,
         )
         self.engine = AsyncEngine(
-            MODEL_ID, backend_config=engine_config
+            self.hf_model,
+            backend_config=engine_config,
+            model_name=MODEL_ID,
+            chat_template_config=ChatTemplateConfig("llama3_1"),
         )
 
-        import lmdeploy.serve.openai.api_server as lmdeploy_api_sever
-        lmdeploy_api_sever.VariableInterface.async_engine = self.engine
-
-        tokenizer = AutoTokenizer.from_pretrained(MODEL_ID)
+        self.tokenizer = AutoTokenizer.from_pretrained(self.hf_model)
         self.stop_tokens = [
-            tokenizer.convert_ids_to_tokens(
-                tokenizer.eos_token_id,
+            self.tokenizer.convert_ids_to_tokens(
+                self.tokenizer.eos_token_id,
             ),
             "<|eot_id|>",
         ]
+
+        import lmdeploy.serve.openai.api_server as lmdeploy_api_server
+        lmdeploy_api_server.VariableInterface.async_engine = self.engine
+
+        OPENAI_ENDPOINTS = [
+            ["/chat/completions", lmdeploy_api_server.chat_completions_v1, ["POST"]],
+            ["/completions", lmdeploy_api_server.completions_v1, ["POST"]],
+            ["/models", lmdeploy_api_server.available_models, ["GET"]],
+        ]
+
+        for route, endpoint, methods in OPENAI_ENDPOINTS:
+            openai_api_app.add_api_route(
+                path=route,
+                endpoint=endpoint,
+                methods=methods,
+                include_in_schema=True,
+            )
 
 
     @bentoml.api
@@ -83,7 +96,17 @@ class LMDeploy:
 
         if system_prompt is None:
             system_prompt = SYSTEM_PROMPT
-        prompt = PROMPT_TEMPLATE.format(user_prompt=prompt, system_prompt=system_prompt)
+
+        messages = [
+            dict(role="system", content=system_prompt),
+            dict(role="user", content=prompt),
+        ]
+
+        prompt = self.tokenizer.apply_chat_template(
+            conversation=messages,
+            add_generation_prompt=True,
+            tokenize=False,
+        )
 
         session_id = abs(uuid.uuid4().int >> 96)
         stream = self.engine.generate(
