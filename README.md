@@ -20,7 +20,7 @@ See [here](https://docs.bentoml.com/en/latest/examples/overview.html) for a full
 
 ```bash
 git clone https://github.com/bentoml/BentoLMDeploy.git
-cd BentoLMDeploy/llama3-8b-instruct
+cd BentoLMDeploy/llama3.1-8b-instruct
 pip install -r requirements.txt
 ```
 
