@@ -3,8 +3,8 @@ import bentoml
 MODEL_ID = "hugging-quants/Meta-Llama-3.1-70B-Instruct-AWQ-INT4"
 BENTO_MODEL_TAG = MODEL_ID.lower().replace("/", "--")
 
-def import_model(model_id, bento_model_tag):
 
+def import_model(model_id, bento_model_tag):
     import torch
     from transformers import AutoModelForCausalLM, AutoTokenizer
 
@@ -21,4 +21,4 @@ def import_model(model_id, bento_model_tag):
 
 
 if __name__ == "__main__":
-    import_model(MODEL_ID, BENTO_MODEL_TAG)    
+    import_model(MODEL_ID, BENTO_MODEL_TAG)

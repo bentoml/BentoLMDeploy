@@ -19,14 +19,12 @@ See [here](https://github.com/bentoml/BentoML?tab=readme-ov-file#%EF%B8%8F-what-
 ## Install dependencies
 
 ```bash
-git clone https://github.com/bentoml/BentoLMDeploy.git
-pip install -r requirements.txt
-```
+git clone https://github.com/bentoml/BentoLMDeploy.git && cd BentoLMDeploy
 
-## Download the model
+# using uv
+uv venv .venv -p 3.11 --seed
 
-```bash
-python import_model.py
+cd llama3.1-70b-instruct-awq && pip install -r requirements.txt
 ```
 
 ## Run the BentoML Service

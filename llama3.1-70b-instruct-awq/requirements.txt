@@ -1,4 +1,4 @@
 autoawq==0.2.5
-bentoml>=1.3.0
-fastapi==0.111.1
-lmdeploy==0.5.2.post1
+bentoml==1.4.15
+fastapi==0.115.12
+lmdeploy==0.8.0
