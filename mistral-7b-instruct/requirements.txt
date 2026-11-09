@@ -1,2 +1,2 @@
 bentoml>=1.3.0
-lmdeploy==0.11.1
+lmdeploy==0.16.0
